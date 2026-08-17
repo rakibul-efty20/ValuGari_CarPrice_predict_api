@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ValuGari — Bangladesh Car Price Estimator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@500;700&family=JetBrains+Mono:wght@400;500;600&family=Fira+Code:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">
+      <svg class="logo-mark" viewBox="0 0 48 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M12 16 L16 8 L32 8 L36 16 Z" class="logo-fill"></path>
+        <rect x="4" y="16" width="40" height="10" rx="4" class="logo-fill"></rect>
+        <circle cx="14" cy="27" r="4" class="logo-wheel"></circle>
+        <circle cx="34" cy="27" r="4" class="logo-wheel"></circle>
+      </svg>
+      <span class="brand-name">ValuGari</span>
+    </div>
+    <div class="status-pill" id="statusPill">
+      <span class="status-dot" id="statusDot"></span>
+      <span id="statusText">Checking API&hellip;</span>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <span class="eyebrow">Bangladesh used car valuation</span>
+  <h1>What&rsquo;s your car actually worth?</h1>
+  <p class="subhead">Trained on 10,000+ real Bikroy.com listings. Enter your car&rsquo;s details for an instant price estimate.</p>
+</section>
+
+<main class="layout">
+
+  <section class="card form-card" aria-labelledby="formTitle">
+    <h2 id="formTitle">Car details</h2>
+
+    <form id="predictForm" novalidate>
+
+      <fieldset>
+        <legend>Identity</legend>
+
+        <div class="field">
+          <label for="brand">Brand</label>
+          <select id="brand" required>
+            <option value="Toyota" selected>Toyota</option>
+            <option value="Honda">Honda</option>
+            <option value="Nissan">Nissan</option>
+            <option value="Mitsubishi">Mitsubishi</option>
+            <option value="Lexus">Lexus</option>
+            <option value="BMW">BMW</option>
+            <option value="Mazda">Mazda</option>
+            <option value="Mercedes-Benz">Mercedes-Benz</option>
+            <option value="Hyundai">Hyundai</option>
+            <option value="Range Rover">Range Rover</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="model">Model <span class="unit">free text</span></label>
+          <input type="text" id="model" placeholder="e.g. Harrier, Corolla, Vogue" value="Harrier" required>
+        </div>
+
+        <div class="field">
+          <label for="condition">Condition</label>
+          <select id="condition" required>
+            <option value="Reconditioned" selected>Reconditioned</option>
+            <option value="Used">Used</option>
+            <option value="New">New</option>
+          </select>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Specs</legend>
+
+        <div class="field">
+          <label for="manYear">Manufacture year</label>
+          <input type="number" id="manYear" min="1990" max="2026" step="1" value="2021" required>
+        </div>
+
+        <div class="field">
+          <label for="engineCapacity">Engine capacity <span class="unit">cc</span></label>
+          <input type="text" inputmode="numeric" pattern="[0-9]*" id="engineCapacity" value="2000" required>
+        </div>
+
+        <div class="field">
+          <label for="kmRun">Kilometers run <span class="unit">km</span></label>
+          <input type="text" inputmode="numeric" pattern="[0-9]*" id="kmRun" value="45000" required>
+        </div>
+      </fieldset>
+
+      <button type="submit" id="predictBtn" class="btn-predict">
+        <span class="btn-label">Estimate price</span>
+        <span class="btn-spinner" aria-hidden="true"></span>
+      </button>
+    </form>
+  </section>
+
+  <section class="card result-card" aria-live="polite">
+    <h2>Estimated value</h2>
+
+    <div class="result-body">
+
+      <div id="resultEmpty" class="result-state is-visible">
+        <svg class="placeholder-icon" viewBox="0 0 64 64" aria-hidden="true">
+          <circle cx="32" cy="32" r="28" class="placeholder-ring"></circle>
+          <text x="32" y="39" text-anchor="middle" class="placeholder-mark">Tk</text>
+        </svg>
+        <p class="result-hint">Fill in the form and estimate to see a price here.</p>
+      </div>
+
+      <div id="resultLoading" class="result-state">
+        <div class="spinner-ring" aria-hidden="true"></div>
+        <p class="result-hint">Running the model&hellip;</p>
+      </div>
+
+      <div id="resultError" class="result-state">
+        <p class="error-title">Can&rsquo;t reach the prediction API</p>
+        <p class="error-detail" id="errorDetail"></p>
+      </div>
+
+      <div id="resultReady" class="result-state">
+        <div class="price-display">
+          <span class="price-currency">Tk</span>
+          <span class="price-value" id="priceValue">0</span>
+        </div>
+
+        <div class="range-block">
+          <div class="range-track">
+            <div class="range-fill" id="rangeFill"></div>
+            <div class="range-marker" id="rangeMarker"></div>
+          </div>
+          <div class="range-labels">
+            <span id="rangeLowLabel">&mdash;</span>
+            <span class="range-labels-caption">likely range</span>
+            <span id="rangeHighLabel">&mdash;</span>
+          </div>
+        </div>
+
+        <p class="result-note">Range reflects how much the model&rsquo;s individual trees disagree with each other &mdash; not a formal confidence interval.</p>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<footer class="page-footer">
+  <span>Random Forest &middot; 10 features &middot; <span id="apiBaseFooter"></span></span>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
