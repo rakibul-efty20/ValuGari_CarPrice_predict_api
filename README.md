@@ -29,8 +29,6 @@ not inside this folder — it's what produced `models/car_price_model.pkl`.
 
 ## Screenshots
 
-*(Add your own — see `screenshot/README.md` for exactly what's needed; I
-can't generate real screenshots of a rendered browser page myself.)*
 
 | Main page | Prediction result |
 |---|---|
